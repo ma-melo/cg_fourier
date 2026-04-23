@@ -1,0 +1,173 @@
+body { 
+    margin: 0; 
+    background: #111; 
+    color: #e0e0e0;  
+    font-family: monospace; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza os blocos horizontalmente */
+    min-height: 100vh;
+    overflow-y: auto; 
+    padding: 20px; /* Evita que o texto encoste nas bordas em telas pequenas */
+}
+
+h1, h2, h3 {
+    color: #00ffcc;
+    letter-spacing: 1px;
+}
+
+strong {
+color: #ff0077;
+}
+
+/* Aplique esta classe em suas divs de conteúdo ou seções de texto */
+.ui, .lesson-text, .references, .lesson-part {
+    max-width: 800px;    /* Limite de linha ideal para leitura */
+    width: 100%;         /* Garante que seja responsivo */
+
+    margin-bottom: 20px; /* Espaçamento entre as seções */
+}
+
+/* Caso queira que as fórmulas e parágrafos específicos também respeitem isso */
+p {
+    line-height: 1.6;    /* Melhora a legibilidade */
+    margin: 1em 0;
+}
+
+.ui { 
+    padding: 20px; 
+    z-index: 10;
+}
+
+.instruction {
+    font-size: 0.8rem; 
+    color: #747e7d; /* Um tom de verde mais discreto */
+    margin-top: 10px;
+}
+
+canvas { 
+    display: block;
+    /*background: #000;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+    */
+}
+
+.references {
+    padding: 40px 20px;
+    text-align: center;
+    color: #ccc; /* Cor cinza clara para as referências */
+}
+
+.references h2 {
+    color: #00ffcc;
+    font-size: 1.2rem;
+}
+
+.references a {
+    color: #00ffcc;
+    text-decoration: none;
+    border-bottom: 1px dotted #00ffcc;
+}
+
+.references a:hover {
+    background: #00ffcc;
+    color: #111;
+}
+
+/* Esconde todos os slides por padrão */
+.slide {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s;
+}
+
+/* Mostra apenas o slide ativo */
+.slide.active {
+    display: flex;
+}
+
+/* Container dos botões fixos */
+.fixed-nav {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    gap: 15px;
+    z-index: 1000; /* Garante que fique acima de tudo */
+}
+
+.nav-btn-fixed {
+    background: rgba(18, 18, 18, 0.8);
+    color: #00ffcc;
+    border: 2px solid #00ffcc;
+    padding: 15px 25px;
+    font-family: monospace;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 50px; /* Estilo pílula */
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px); /* Efeito de vidro */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.nav-btn-fixed:hover {
+    background: #00ffcc;
+    color: #111;
+    box-shadow: 0 0 20px #00ffcc;
+    transform: translateY(-3px);
+}
+
+/* Botão anterior um pouco mais discreto */
+.nav-btn-fixed.prev {
+    border-color: #747e7d;
+    color: #747e7d;
+}
+
+.nav-btn-fixed.prev:hover {
+    background: #747e7d;
+    color: #111;
+    box-shadow: 0 0 15px #747e7d;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Layout dos Cards no Slide 4 */
+.step-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
+    padding: 0 20px;
+}
+
+.step-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid #00ffcc;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: left;
+    transition: background 0.3s;
+}
+
+.step-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.step-header {
+    color: #00ffcc;
+    font-weight: bold;
+
+    font-size: 0.85em;
+    margin-bottom: 10px;
+}
+
+.step-card p {
+    font-size: 0.9em;
+    line-height: 1.6;
+    margin: 0;
+    color: #ddd;
+}

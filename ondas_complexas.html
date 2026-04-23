@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fourier Didático - Epíciclos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body { margin: 0; background: #111; color: white; font-family: sans-serif; overflow: hidden; }
+        .controls { position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px; border: 1px solid #444; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>Visualizador de Fourier</h2>
+        <p>Aproximação de uma forma complexa usando epíciclos.</p>
+        <div id="slider-container"></div>
+    </div>
+
+<script>
+let x = [];
+let fourierX;
+let time = 0;
+let path = [];
+
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    
+    // 1. Criando uma forma para o algoritmo "aprender" (um quadrado com ruído)
+    // Em um material avançado, esses pontos viriam do desenho do usuário.
+    for (let i = 0; i < 100; i++) {
+        let angle = map(i, 0, 100, 0, TWO_PI);
+        x[i] = createVector(150 * cos(angle), 150 * sin(angle));
+        // Adicionando um pouco de variação para não ser um círculo perfeito
+        if (i % 25 < 5) x[i].mult(1.3); 
+    }
+
+    // 2. Aplicar a Transformada Discreta de Fourier
+    fourierX = dft(x);
+    
+    // Ordenar círculos do maior para o menor (essencial para a estética do Jezzamon)
+    fourierX.sort((a, b) => b.amp - a.amp);
+}
+
+function dft(points) {
+    let X = [];
+    const N = points.length;
+    for (let k = 0; k < N; k++) {
+        let re = 0;
+        let im = 0;
+        for (let n = 0; n < N; n++) {
+            let phi = (TWO_PI * k * n) / N;
+            re += points[n].x * cos(phi) + points[n].y * sin(phi);
+            im -= points[n].x * sin(phi) - points[n].y * cos(phi);
+        }
+        re = re / N;
+        im = im / N;
+
+        let freq = k;
+        let amp = sqrt(re * re + im * im);
+        let phase = atan2(im, re);
+        X[k] = { re, im, freq, amp, phase };
+    }
+    return X;
+}
+
+function draw() {
+    background(18);
+    
+    let v = drawEpicycles(width / 2, height / 2, 0, fourierX);
+    path.unshift(v);
+
+    // Desenhar a linha resultante
+    beginShape();
+    noFill();
+    stroke(0, 255, 204);
+    strokeWeight(2);
+    for (let i = 0; i < path.length; i++) {
+        vertex(path[i].x, path[i].y);
+    }
+    endShape();
+
+    const dt = TWO_PI / fourierX.length;
+    time += dt;
+
+    if (time > TWO_PI) {
+        time = 0;
+        path = [];
+    }
+}
+
+function drawEpicycles(x, y, rotation, fourier) {
+    for (let i = 0; i < fourier.length; i++) {
+        let prevx = x;
+        let prevy = y;
+        let freq = fourier[i].freq;
+        let radius = fourier[i].amp;
+        let phase = fourier[i].phase;
+        
+        x += radius * cos(freq * time + phase + rotation);
+        y += radius * sin(freq * time + phase + rotation);
+
+        stroke(255, 50);
+        noFill();
+        ellipse(prevx, prevy, radius * 2);
+        stroke(255, 150);
+        line(prevx, prevy, x, y);
+    }
+    return createVector(x, y);
+}
+</script>
+</body>
+</html>

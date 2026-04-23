@@ -1,0 +1,78 @@
+(function() {
+const canvas = document.getElementById('fourierCanvas');
+const ctx = canvas.getContext('2d');
+
+let time = 0;
+let wave = [];
+let numHarmonics = 5; // Altere este valor para ver a precisão aumentar!
+
+function animate() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let x = 300; // Posição central dos círculos
+    let y = canvas.height / 4;
+
+    ctx.strokeStyle = 'rgba(0, 255, 200, 0.4)';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i < numHarmonics; i++) {
+        let prevX = x;
+        let prevY = y;
+
+        // Apenas harmônicos ímpares (1, 3, 5...)
+        let n = i * 2 + 1;
+        let radius = 100 * (4 / (n * Math.PI)); // Amplitude de Fourier
+        
+        // Movimento circular (frequência aumenta com n)
+        x += radius * Math.cos(n * time);
+        y += radius * Math.sin(n * time);
+
+        // Desenha o círculo do harmônico
+        ctx.beginPath();
+        ctx.arc(prevX, prevY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Desenha o raio
+        ctx.beginPath();
+        ctx.moveTo(prevX, prevY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+
+    // Armazena o ponto final para desenhar a onda
+    wave.unshift(y);
+    if (wave.length > 800) wave.pop();
+
+    // Linha conectando o último círculo à onda
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(500, wave[0]);
+    ctx.strokeStyle = '#fff';
+    ctx.stroke();
+
+    // Desenha a onda resultante
+    ctx.beginPath();
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < wave.length; i++) {
+        ctx.lineTo(i + 500, wave[i]);
+    }
+    ctx.stroke();
+
+    time -= 0.03; // Velocidade da animação
+    document.getElementById('hCount').innerText = numHarmonics;
+    
+    requestAnimationFrame(animate);
+}
+
+// Interação: use as setas para cima/baixo para mudar os harmônicos
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp') numHarmonics++;
+    if (e.key === 'ArrowDown' && numHarmonics > 1) numHarmonics--;
+});
+
+animate();
+
+})();
