@@ -9,7 +9,6 @@
 
     function draw() {
         if (canvas.offsetParent !== null) {
-            // Aumentamos a altura do canvas para caber o empilhamento
             canvas.width = 800;
             canvas.height = 300; 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -17,7 +16,8 @@
             const nHarmonics = parseInt(slider.value);
             display.innerText = nHarmonics;
 
-            // --- Lado Esquerdo: Onda Resultante (Soma) ---
+            // -------------------------------
+            // Lado Esquerdo: onda resultante 
             ctx.save();
             ctx.translate(50, 150); // Posicionada no topo
             
@@ -33,17 +33,18 @@
 
             for (let x = 0; x < 300; x++) {
                 let y = 0;
-                for (let n = 1; n <= nHarmonics; n += 2) {
-                    y += (4 / (n * Math.PI)) * Math.sin(n * (x * 0.05 - time));
+                for (let n = 1; n <= nHarmonics; n += 2) { //a onda quadrada só tem harmonicos ímpares
+                    y += (4 / (n * Math.PI)) * Math.sin(n * (x * 0.05 - time)); // soma os harmonicos
                 }
                 let py = y * 60; 
                 if (x === 0) ctx.moveTo(x, py);
                 else ctx.lineTo(x, py);
             }
-            ctx.stroke();
-            ctx.restore();
+        ctx.stroke();
+        ctx.restore();
 
-            // --- Lado Direito: Harmônicos Empilhados ---
+        // -------------------------------------------
+            //  Lado Direito: harmonicos empilhados 
             const startX = 450;
             const startY = 100;
             const spacing = Math.min(30, 450 / (nHarmonics / 2 + 1)); // Ajusta espaço conforme a quantidade
@@ -52,18 +53,16 @@
             
             for (let n = 1, j = 0; n <= nHarmonics; n += 2, j++) {
                 ctx.save();
-                // O segredo está aqui: movemos cada harmônico para baixo no eixo Y
-                ctx.translate(startX, startY + (j * spacing));
+                ctx.translate(startX, startY + (j * spacing)); //move harmônico para baixo 
                 
                 ctx.beginPath();
                 ctx.strokeStyle = colors[j % colors.length];
                 ctx.lineWidth = 1.5;
-                // Deixa os harmônicos mais altos mais transparentes para focar nos principais
-                ctx.globalAlpha = Math.max(0.2, 1 - (j * 0.05));
+                ctx.globalAlpha = Math.max(0.2, 1 - (j * 0.05)); //muda opacidade
 
                 for (let x = 0; x < 300; x++) {
                     let y = (4 / (n * Math.PI)) * Math.sin(n * (x * 0.05 - time));
-                    let py = y * 40; // Amplitude individual ligeiramente menor para não embolar
+                    let py = y * 40; 
                     if (x === 0) ctx.moveTo(x, py);
                     else ctx.lineTo(x, py);
                 }
@@ -71,7 +70,7 @@
                 ctx.restore();
             }
 
-            // Legendas Estilizadas
+            
             ctx.fillStyle = "white";
             ctx.font = "bold 16px monospace";
             ctx.fillText("ONDA QUADRADA (SOMA)", 50, 50);

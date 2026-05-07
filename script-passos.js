@@ -7,7 +7,7 @@
         {x: -18, y: -20}, {x: 0, y: -60}
     ];
 
-    // FUNÇÃO DE PRECISÃO: Interpola pontos entre os vértices para criar retas
+    // ligando os pontos para ter mais dados
     function interpolatePoints(points, samplesPerEdge) {
         let interpolated = [];
         for (let i = 0; i < points.length - 1; i++) {
@@ -24,7 +24,7 @@
         return interpolated;
     }
 
-    // Criamos 200 pontos a partir dos 10 originais
+    // criamos 200 pontos a partir dos 10 originais
     const starPoints = interpolatePoints(baseStarPoints, 20);
 
     function dft(points) {
@@ -43,7 +43,7 @@
         return X;
     }
 
-    // Calculamos 200 epíciclos!
+    // Calculamos 200 epíciclos
     const fourierStar = dft(starPoints).sort((a, b) => b.amp - a.amp);
     
     const ctx1 = document.getElementById('canvas-passo1')?.getContext('2d');
@@ -67,13 +67,13 @@
             ctx.translate(100, 75);
         });
 
-        // PASSO 1: Alta Densidade de Pontos
+        // PASSO 1: 
         ctx1.fillStyle = '#00ffcc';
         starPoints.forEach((p, i) => {
             if (i % 5 === 0) ctx1.fillRect(p.x-1, p.y-1, 2, 2);
         });
 
-        // PASSO 2: Muitos Círculos (Exibindo os 15 principais para não travar o visual)
+        // PASSO 2: os círculos (exibição de 15)
         let x2 = 0, y2 = 0;
         for (let i = 0; i < Math.min(fourierStar.length, 15); i++) {
             let prevx = x2; let prevy = y2;
@@ -86,7 +86,7 @@
             ctx2.stroke();
         }
 
-        // PASSO 3: A Estrela Perfeita
+        // PASSO 3
         let x3 = 0, y3 = 0;
         for (let i = 0; i < fourierStar.length; i++) {
             let { freq, amp, phase } = fourierStar[i];

@@ -71,12 +71,12 @@
             // 1. Desenha a caixa primeiro (atrás)
             drawBox(xzAngle, yAngle);
 
-            // 2. Desenha a Senoide
+            // Senoide
             ctx.beginPath();
             ctx.strokeStyle = '#00ffcc';
             ctx.lineWidth = 3;
             
-            // Reduzido o incremento para 0.008 (velocidade de rotação da onda)
+            // (velocidade de rotação da onda)
             animAmt += 0.008; 
 
             for (let i = 0; i < 250; i++) {

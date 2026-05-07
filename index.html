@@ -65,7 +65,7 @@
             <div class="ui">
         <h1>1. A Onda Quadrada</h1>
         <p>Harmônicos: <span id="hCount">5</span></p>
-        <p class="instruction">Use as teclas ↑ e ↓ para alterar os harmônicos.</p>
+        <p class="instruction">Use as teclas <- e -> para alterar os harmônicos.</p>
         <p>Um único harmônico produz uma função seno; quanto mais harmônicos, mais próximo da onda quadrada.</p>
     </div>
 
@@ -115,82 +115,59 @@
             <canvas id="fourierComplexa"></canvas>
         </div>
 
-        <div class="step-container">
-            <div class="step-card">
-                <h3>Passo 1: O Desenho como Jornada</h3>
-                <p>
-                    Não vemos o desenho como uma imagem estática, mas como uma <strong>linha do tempo</strong>. 
-                    Mapeamos a posição <b>X</b> e <b>Y</b> em cada instante <b>T</b>. 
-                    Isso cria uma lista de coordenadas que descreve o movimento da mão.
-                </p>
-                <p>$$f(t) = [x(t), y(t)]$$</p>
-                <p>Para o computador, um desenho é uma jornada. Mapeamos a posição <strong>X</strong> e <strong>Y</strong> em cada instante exato de <strong>Tempo (T)</strong>.</p>
-                <div class="step-info">
-                    <code>[ T=1 ] X: 12, Y: 40</code><br>
-                    <code>[ T=2 ] X: 18, Y: 65</code>
-                </div>
-            </div>
-
-            <div class="step-card">
-                <h3>Passo 2: O Motor Matemático</h3>
-                <p>
-                    Alimentamos esses dados na <strong>Transformada de Fourier</strong>. 
-                    O "motor" decompõe esse movimento complexo em uma coleção de círculos (epíciclos), 
-                    cada um com seu próprio tamanho, velocidade e ângulo inicial.
-                </p>
-                <div class="code-badge">DFT → {amp, freq, fase}</div>
-            </div>
-
-            <div class="step-card">
-                <h3>Passo 3: A Corrente de Círculos</h3>
-                <p>
-                    Conectamos os círculos em série: o centro de um na borda do anterior. 
-                    Enquanto todos giram simultaneamente, o rastro do <strong>último círculo</strong> 
-                    redesenha a forma original perfeitamente.
-                </p>
-                <p>$$ \sum \text{Epíciclos} = \text{Desenho} $$</p>
-            </div>
-        </div>
-        
-         
+       
 
         <div class="ui">
             <h1>A Construção do Desenho</h1>
         </div>
 
-        <div class="step-container">
-            <div class="step-card">
-                <h3>Passo 1: Pontos no Tempo</h3>
-                <canvas id="canvas-passo1" width="200" height="150"></canvas>
-                <p>Mapeamos a jornada: coordenadas <b>X</b> e <b>Y</b> gravadas em cada instante <b>T</b>.</p>
-            </div>
+<div class="step-container">
+    <div class="step-card">
+        <h3>Passo 1: A Trajetória</h3>
+        <canvas id="canvas-passo1" width="200" height="150"></canvas>
+        <p>
+            Não vemos o desenho como uma imagem estática, mas como uma <strong>linha do tempo</strong>. 
+        </p>
+        <p>$$f(t) = [x(t), y(t)]$$</p>
+        <p>Mapeamos a posição <b>X</b> e <b>Y</b> em cada instante <b>T</b>.</p>
+    </div>
 
-            <div class="step-card">
-                <h3>Passo 2: O Motor de Fourier</h3>
-                <canvas id="canvas-passo2" width="200" height="150"></canvas>
-                <p>A matemática calcula os círculos necessários para girar e encontrar esses pontos.</p>
-            </div>
+    <div class="step-card">
+        <h3>Passo 2:Os epiciclos</h3>
+        <canvas id="canvas-passo2" width="200" height="150"></canvas>
+        <code>DFT → {amp, freq, fase}</code>
+        <p>
+            A Transformada de Fourier permite decompor esse movimento complexo em uma coleção de círculos (epíciclos) com tamanhos e velocidades únicas.
+        </p>
+    </div>
 
-            <div class="step-card">
-                <h3>Passo 3: A Estrela Final</h3>
-                <canvas id="canvas-passo3" width="200" height="150"></canvas>
-                <p>A soma dos movimentos resulta na forma perfeitamente redesenhada.</p>
-            </div>
+    <div class="step-card">
+        <h3>Passo 3: A Corrente</h3>
+        <canvas id="canvas-passo3" width="200" height="150"></canvas>
+        <p>$$ \sum \text{Epíciclos} = \text{Desenho} $$</p>
+        <p>
+            Conectamos os círculos em série. O rastro do <strong>último círculo</strong> redesenha a forma original.
+        </p>
+    </div>
+</div>
+
+</div>
+
+<div class="slide" id="slide-5">
+            <div class="ui">
+            <h1>5. Exemplo de Desenhos com Círculos</h1>
         </div>
-
-
-
-    
+    <canvas id="example" width="400" height="400" style="background: #111; border-radius: 10px;"></canvas>
 </div>
 
 
-    <div class="slide" id="slide-5">
+    <div class="slide" id="slide-6">
         <footer class="references" style="background: none; border: none;">
             <h1>Referências e Créditos</h1>
             <p><a href="https://codepen.io/andremichelle/pen/LVzMRz" target="_blank">Código inspirado por André Michelle (Codepen)</a></p>
             <p><a href="https://www.jezzamon.com/fourier/pt-br.html" target="_blank">Inspiração: "Uma introdução interativa às transformadas de Fourier" de Jez Swanson</a></p>
             <br>
-            <p>Este material foi desenvolvido com auxílio de Inteligência Artificial para a interface gráfica, construção de alguns exemplos, bem como, resolução de conflitos no código.</p>
+            <p>Este material foi desenvolvido com auxílio de Inteligência Artificial para a interface gráfica, produção do exemplo da sinoide complexa, bem como, resolução de conflitos no código.</p>
             
             <div style="margin-top: 50px;">
                 <button class="nav-btn-fixed" style="position: static;" onclick="showSlide(0)">Voltar ao Início</button>
@@ -199,7 +176,7 @@
     </div>
 </div> <script>
     let currentSlide = 0;
-    const totalSlides = 6; // Slide 0, 1, 2 e 3
+    const totalSlides = 7; 
 
     function changeSlide(direction) {
         let nextSlide = currentSlide + direction;
@@ -233,5 +210,6 @@
     <script src="script-espiral.js"></script>
     <script src="script-harmonics.js"></script>
     <script src="script-passos.js"></script>
+    <script src="script-examplo.js"></script>
 </body>
 </html>
