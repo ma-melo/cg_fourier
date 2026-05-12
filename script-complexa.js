@@ -91,7 +91,7 @@
             
             
             ctx.beginPath(); // desenha o rastro projetado
-            ctx.strokeStyle = '#00ffcc';
+            ctx.strokeStyle = '#ffb74d';
             ctx.lineWidth = 2;
             path.forEach((p, i) => {
                 const projected = multiplyMatrixVector(rotationMat, p);

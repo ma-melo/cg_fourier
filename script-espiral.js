@@ -73,7 +73,7 @@
 
             // Senoide
             ctx.beginPath();
-            ctx.strokeStyle = '#00ffcc';
+            ctx.strokeStyle = '#4fc3f7';
             ctx.lineWidth = 3;
             
             // (velocidade de rotação da onda)

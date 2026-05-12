@@ -28,7 +28,7 @@
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.strokeStyle = '#00ffcc';
+            ctx.strokeStyle = '#4fc3f7';
             ctx.lineWidth = 3;
 
             for (let x = 0; x < 300; x++) {

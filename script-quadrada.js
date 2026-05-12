@@ -1,5 +1,6 @@
 (function() {
 const canvas = document.getElementById('fourierCanvas');
+if (!canvas) return; // como os outros scripts já fazem
 const ctx = canvas.getContext('2d');
 
 let time = 0;
@@ -8,9 +9,9 @@ let numHarmonics = 10;
 let centerX, centerY; /* nó pricinpal do movimento hierarquico.*/
 
 const colorBone = '#555';       // Cor dos braços
-const colorJoint = '#ff0055';   // Cor das articulações
+const colorJoint = '#c084fc';   // Cor das articulações
 const colorEndEffector = '#fff';// Cor da ponta que desenha
-const colorWave = '#00ffcc'; 
+const colorWave = '#4fc3f7'; 
 
 function init(){
     canvas.width = window.innerWidth;
@@ -63,7 +64,7 @@ function draw(){
         ctx.beginPath();
         ctx.strokeStyle= colorBone;
         ctx.lineWidth = 0.5;
-        ctx.arc(prevX, prevY, 150 * (4 / (i * Math.PI)), 0, Math.PI * 2);
+        ctx.arc(prevX, prevY, 150 * (4 / (n * Math.PI)), 0, Math.PI * 2);
         ctx.stroke();
 
     }

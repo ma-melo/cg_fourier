@@ -11,13 +11,18 @@ body {
     padding: 20px; /* Evita que o texto encoste nas bordas em telas pequenas */
 }
 
-h1, h2, h3 {
-    color: #00ffcc;
+h1, h2 {
+    color: #4fc3f7;
+    letter-spacing: 1px;
+}
+
+h3 {
+    color: #c084fc;
     letter-spacing: 1px;
 }
 
 strong {
-color: #ff0077;
+color: #ffb74d;
 }
 
 canvas{
@@ -64,18 +69,18 @@ canvas {
 }
 
 .references h2 {
-    color: #00ffcc;
+    color: #4fc3f7;
     font-size: 1.2rem;
 }
 
 .references a {
-    color: #00ffcc;
+    color: #4fc3f7;
     text-decoration: none;
-    border-bottom: 1px dotted #00ffcc;
+    border-bottom: 1px dotted #4fc3f7;
 }
 
 .references a:hover {
-    background: #00ffcc;
+    background: #4fc3f7;
     color: #111;
 }
 
@@ -93,6 +98,11 @@ canvas {
     display: flex;
 }
 
+/* Centraliza o conteúdo do primeiro slide */
+.slide:first-of-type {
+    justify-content: center;
+}
+
 /* Container dos botões fixos */
 .fixed-nav {
     position: fixed;
@@ -105,8 +115,8 @@ canvas {
 
 .nav-btn-fixed {
     background: rgba(18, 18, 18, 0.8);
-    color: #00ffcc;
-    border: 2px solid #00ffcc;
+    color: #4fc3f7;
+    border: 2px solid #4fc3f7;
     padding: 15px 25px;
     font-family: monospace;
     font-weight: bold;
@@ -118,9 +128,9 @@ canvas {
 }
 
 .nav-btn-fixed:hover {
-    background: #00ffcc;
+    background: #4fc3f7;
     color: #111;
-    box-shadow: 0 0 20px #00ffcc;
+    box-shadow: 0 0 20px #4fc3f7;
     transform: translateY(-3px);
 }
 
@@ -152,7 +162,7 @@ canvas {
 
 .step-card {
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(0, 255, 204, 0.2);
+    border: 1px solid #4fc3f7;
     border-radius: 12px;
     padding: 24px;
     width: 320px; 
@@ -178,7 +188,7 @@ canvas {
     padding: 5px 10px;
     border-radius: 4px;
     margin: 10px 0;
-    color: #00ffcc;
+    color: #4fc3f7;
 }
 
 .step-card:hover {
@@ -186,7 +196,7 @@ canvas {
 }
 
 .step-header {
-    color: #00ffcc;
+    color: #4fc3f7;
     font-weight: bold;
 
     font-size: 0.85em;

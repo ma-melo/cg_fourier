@@ -16,13 +16,26 @@
     <button class="nav-btn-fixed prev" onclick="changeSlide(-1)">❮ Anterior</button>
     <button class="nav-btn-fixed next" onclick="changeSlide(1)">Próximo ❯</button>
 </div>
+
 <div class="main-container">
     <div class="slide active" id="slide-0">
     <section class="lesson-text">
     <div class="ui">
+        <div style="text-align: center;">
+        <h1 style="font-size: 4rem;">Desenhando com Séries de Fourier</h1>
+        <p style="font-size: 1.1rem;">Explorando as <strong>Séries de Fourier</strong> e suas aplicações na <strong>Computação Gráfica</strong></p>
+        <h3 style="font-size: 30px;">Marcos Abílio & Maria Eduarda</h3>
+        </div>
+    </section>
+    </div>
+</div>
+
+    <div class="slide" id="slide-1">
+    <div class="ui">
         <h1>O que são as Séries de Fourier?</h1>
         
-        <p>A <strong>Série de Fourier</strong> decompõe funções periódicas complexas em uma soma infinita de senos e cossenos (termos harmônicos) mais simples. Ela permite representar sinais no <strong>domínio da frequência</strong>, facilitando análises físicas, acústicas e o processamento de sinais.</p>
+        <p>A <strong>Série de Fourier</strong> é uma ferramenta matemática que decompõe funções periódicas complexas em uma soma infinita de senos e cossenos (termos harmônicos) mais simples. Ela permite representar sinais no <strong>domínio da frequência</strong>, facilitando análises físicas, acústicas e o processamento de sinais.</p>
+        <p>Um exemplo seria pegar um som complexo e descobrir quais notas individuais o compõem. Cada termo na série representa uma "nota" ou frequência específica, e a soma de todas essas notas recria o som original.</p>
 
         <div class="math-box">
             <h3>A Forma Geral</h3>
@@ -49,35 +62,43 @@
         </div>
 
         <div class="applications">
-            <h3>Aplicações no Mundo Real</h3>
+            <h3>Aplicações das Séries de Fourier no Mundo Real</h3>
             <ul>
-                <li><strong>Compactação Digital:</strong> Essencial para formatos como MP3 e JPEG.</li>
-                <li><strong>Streaming:</strong> Permite o carregamento rápido de vídeos e áudios online.</li>
-                <li><strong>Cancelamento de Ruído:</strong> Usado em fones para isolar frequências indesejadas.</li>
+                <li><strong>Compactação Digital:</strong> Formatos como MP3 e JPEG.</li>
+                <li><strong>Streaming:</strong> Carregamento rápido de vídeos e áudios online.</li>
+                <li><strong>Cancelamento de Ruído:</strong> Fones de ouvido que isolam certas frequências indesejadas.</li>
             </ul>
         </div>
     </div>
 </section>
-        
+</div>
+
+    <div class="slide" id="slide-2">
+            <div class="ui">
+        <h1>O que tem haver com Computação Gráfica?</h1>
+        <p>As séries de Fourier não são apenas para sons ou sinais; elas também são uma ferramenta poderosa para a computação gráfica. 
+            Elas nos permitem criar formas complexas, animar movimentos suaves e até mesmo simular fenômenos naturais como ondas e luz.</p>
+        <p>Vamos começar com um exemplo clássico: a onda quadrada. Ela é composta por uma série de ondas senoidais, e à medida que adicionamos mais harmônicos, a forma se torna cada vez mais parecida com uma onda quadrada perfeita.</p>
+        <h2>Fenômeno de Gibbs</h2>
+        <p>Mesmo com um número infinito de harmônicos, a série de Fourier de uma onda quadrada apresenta um fenômeno chamado "Fenômeno de Gibbs".
+            </div>
     </div>
 
-    <div class="slide" id="slide-1">
+    <div class="slide" id="slide-3">
             <div class="ui">
         <h1>1. A Onda Quadrada</h1>
         <p>Harmônicos: <span id="hCount">5</span></p>
         <p class="instruction">Use as teclas <- e -> para alterar os harmônicos.</p>
         <p>Um único harmônico produz uma função seno; quanto mais harmônicos, mais próximo da onda quadrada.</p>
-    </div>
-
+            </div>
     <canvas id="fourierCanvas"></canvas>
     </div>
 
-    
-    <div class="slide" id="slide-2">
+    <div class="slide" id="slide-4">
             <section class="lesson-part">
                 <div class="ui">
                     <h1>2. A Transformada de Fourier</h1>
-                    <p> De maneira simples, a transformada de fourier é uma ferramenta matemática que divide qualquer padrão complexo em várias ondas senoidais puras e simples. É como desfazer uma vitamina e voltar para as frutas originais.</p>
+                    <p> De maneira simples, a transformada de fourier é uma ferramenta matemática que divide qualquer padrão complexo em várias ondas senoidais puras e simples.</p>
                 </div>
                 <p class="instruction">Arraste o controle para ver como a soma de ondas simples forma uma onda quadrada.</p>
                 <input type="range" id="harmonics-slider" min="1" max="150" step="2" value="10" style="width: 80%;">
@@ -87,7 +108,7 @@
          </section>
     </div>
 
-    <div class="slide" id="slide-3">
+    <div class="slide" id="slide-5">
             <section class="lesson-part">
                 <div class="ui">
                     <h1>3. A Senoide Complexa</h1>
@@ -104,64 +125,62 @@
     </div>
     
 
-<div class="slide" id="slide-4">
-    
-        <div class="ui">
-            <h1>4. Desenhando Formas Complexas com Epíciclos</h1>
-            <p>Como transformamos um rastro no papel em uma dança de círculos?</p>
-        </div>
-
-        <div class="canvas-container">
-            <canvas id="fourierComplexa"></canvas>
-        </div>
-
-       
-
-        <div class="ui">
-            <h1>A Construção do Desenho</h1>
-        </div>
-
-<div class="step-container">
-    <div class="step-card">
-        <h3>Passo 1: A Trajetória</h3>
-        <canvas id="canvas-passo1" width="200" height="150"></canvas>
-        <p>
-            Não vemos o desenho como uma imagem estática, mas como uma <strong>linha do tempo</strong>. 
-        </p>
-        <p>$$f(t) = [x(t), y(t)]$$</p>
-        <p>Mapeamos a posição <b>X</b> e <b>Y</b> em cada instante <b>T</b>.</p>
-    </div>
-
-    <div class="step-card">
-        <h3>Passo 2:Os epiciclos</h3>
-        <canvas id="canvas-passo2" width="200" height="150"></canvas>
-        <code>DFT → {amp, freq, fase}</code>
-        <p>
-            A Transformada de Fourier permite decompor esse movimento complexo em uma coleção de círculos (epíciclos) com tamanhos e velocidades únicas.
-        </p>
-    </div>
-
-    <div class="step-card">
-        <h3>Passo 3: A Corrente</h3>
-        <canvas id="canvas-passo3" width="200" height="150"></canvas>
-        <p>$$ \sum \text{Epíciclos} = \text{Desenho} $$</p>
-        <p>
-            Conectamos os círculos em série. O rastro do <strong>último círculo</strong> redesenha a forma original.
-        </p>
-    </div>
-</div>
-
-</div>
-
-<div class="slide" id="slide-5">
-            <div class="ui">
-            <h1>5. Exemplo de Desenhos com Círculos</h1>
-        </div>
-    <canvas id="example" width="400" height="400" style="background: #111; border-radius: 10px;"></canvas>
-</div>
-
-
     <div class="slide" id="slide-6">
+            <div class="ui">
+                <h1>4. Desenhando Formas Complexas com Epíciclos</h1>
+                <p>Como transformamos um rastro no papel em uma dança de círculos?</p>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="fourierComplexa"></canvas>
+            </div>
+
+        
+
+            <div class="ui">
+                <h1>A Construção do Desenho</h1>
+            </div>
+
+        <div class="step-container">
+            <div class="step-card">
+                <h3>Passo 1: A Trajetória</h3>
+                <canvas id="canvas-passo1" width="200" height="150"></canvas>
+                <p>
+                    Não vemos o desenho como uma imagem estática, mas como uma <strong>linha do tempo</strong>. 
+                </p>
+                <p>$$f(t) = [x(t), y(t)]$$</p>
+                <p>Mapeamos a posição <b>X</b> e <b>Y</b> em cada instante <b>T</b>.</p>
+            </div>
+
+            <div class="step-card">
+                <h3>Passo 2:Os epiciclos</h3>
+                <canvas id="canvas-passo2" width="200" height="150"></canvas>
+                <code>DFT → {amp, freq, fase}</code>
+                <p>
+                    A Transformada de Fourier permite decompor esse movimento complexo em uma coleção de círculos (epíciclos) com tamanhos e velocidades únicas.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <h3>Passo 3: A Corrente</h3>
+                <canvas id="canvas-passo3" width="200" height="150"></canvas>
+                <p>$$ \sum \text{Epíciclos} = \text{Desenho} $$</p>
+                <p>
+                    Conectamos os círculos em série. O rastro do <strong>último círculo</strong> redesenha a forma original.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide" id="slide-7">
+            <div class="ui">
+                <h1>5. Exemplo de Desenhos com Círculos</h1>
+            </div>
+        <canvas id="example" width="400" height="400" style="background: #111; border-radius: 10px;"></canvas>
+    </div>
+
+
+    <div class="slide" id="slide-8">
         <footer class="references" style="background: none; border: none;">
             <h1>Referências e Créditos</h1>
             <p><a href="https://codepen.io/andremichelle/pen/LVzMRz" target="_blank">Código inspirado por André Michelle (Codepen)</a></p>
@@ -176,7 +195,7 @@
     </div>
 </div> <script>
     let currentSlide = 0;
-    const totalSlides = 7; 
+    const totalSlides = 9; 
 
     function changeSlide(direction) {
         let nextSlide = currentSlide + direction;
@@ -210,6 +229,6 @@
     <script src="script-espiral.js"></script>
     <script src="script-harmonics.js"></script>
     <script src="script-passos.js"></script>
-    <script src="script-examplo.js"></script>
+    <script src="script-example.js"></script>
 </body>
 </html>

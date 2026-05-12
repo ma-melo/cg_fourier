@@ -54,7 +54,7 @@
     let path = [];
 
     function drawSteps() {
-        if (!ctx1 || document.getElementById('slide-4').offsetParent === null) {
+        if (!ctx1 || document.getElementById('slide-6').offsetParent === null) {
             requestAnimationFrame(drawSteps);
             return;
         }
@@ -68,7 +68,7 @@
         });
 
         // PASSO 1: 
-        ctx1.fillStyle = '#00ffcc';
+        ctx1.fillStyle = '#4fc3f7';
         starPoints.forEach((p, i) => {
             if (i % 5 === 0) ctx1.fillRect(p.x-1, p.y-1, 2, 2);
         });
@@ -81,7 +81,7 @@
             x2 += amp * Math.cos(freq * time + phase);
             y2 += amp * Math.sin(freq * time + phase);
             ctx2.beginPath();
-            ctx2.strokeStyle = 'rgba(0, 255, 204, 0.2)';
+            ctx2.strokeStyle = '#4fc3f7';
             ctx2.arc(prevx, prevy, amp, 0, Math.PI * 2);
             ctx2.stroke();
         }
@@ -96,7 +96,7 @@
         path.unshift({x: x3, y: y3});
         
         ctx3.beginPath();
-        ctx3.strokeStyle = '#00ffcc';
+        ctx3.strokeStyle = '#4fc3f7';
         ctx3.lineWidth = 2;
         path.forEach((p, i) => {
             if (i === 0) ctx3.moveTo(p.x, p.y);
