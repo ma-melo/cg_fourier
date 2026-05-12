@@ -4,201 +4,163 @@
     const ctx = canvas.getContext('2d');
 
     canvas.width  = 700;
-    canvas.height = 450;
+    canvas.height = 480;
 
+    // Estado
     const STATE = { IDLE: 0, DRAWING: 1, ANIMATING: 2 };
-    let state = STATE.IDLE;
+    let state        = STATE.IDLE;
+    let rawPoints    = [];
+    let fourierData  = [];
+    let epicyclePath = [];
+    let animTime     = 0;
+    let animId       = null;
+    let activeTab    = 'draw';
 
-    let rawPoints   = [];   // pontos capturados pelo mouse (amostrados)
-    let fourierData = [];   // resultado da DFT
-    let epicyclePath = [];  // rastro do último epiciclo
-    let animTime    = 0;
-    let animId      = null;
-
-    // botões
-    const btnClear = document.createElement('button');
-    const btnRun   = document.createElement('button');
-
-    [btnClear, btnRun].forEach(btn => {
-        btn.style.cssText = `
-            font-family: monospace; font-size: 13px; cursor: pointer;
-            padding: 8px 20px; border-radius: 20px; margin: 6px 5px 0;
-            border: 2px solid; transition: all .25s;
-        `;
-    });
-
-    btnClear.textContent = 'Limpar';
-    btnClear.style.borderColor = '#747e7d';
-    btnClear.style.color       = '#747e7d';
-    btnClear.style.background  = 'transparent';
-
-    btnRun.textContent = '▶  Animar';
-    btnRun.style.borderColor = '#ffb74d';
-    btnRun.style.color       = '#ffb74d';
-    btnRun.style.background  = 'transparent';
-    btnRun.disabled = true;
-    btnRun.style.opacity = '0.4';
-
-    const hint = document.createElement('p');
-    hint.style.cssText = 'font-family:monospace; font-size:.8rem; color:#747e7d; margin:4px 0 0;';
-    hint.textContent   = 'Desenhe algo no canvas e clique em Animar.';
-
-    // Insere controles logo após o canvas
-    canvas.insertAdjacentElement('afterend', hint);
-    hint.insertAdjacentElement('afterend', btnRun);
-    hint.insertAdjacentElement('afterend', btnClear);
-
-    // Hover nos botões 
-    btnClear.addEventListener('mouseenter', () => { btnClear.style.background='#747e7d'; btnClear.style.color='#111'; });
-    btnClear.addEventListener('mouseleave', () => { btnClear.style.background='transparent'; btnClear.style.color='#747e7d'; });
-    btnRun.addEventListener('mouseenter',   () => { if (!btnRun.disabled){ btnRun.style.background='#ffb74d'; btnRun.style.color='#111'; }});
-    btnRun.addEventListener('mouseleave',   () => { btnRun.style.background='transparent'; btnRun.style.color='#ffb74d'; });
-
-    // Helpers
-    function getPos(e) {
-        const r = canvas.getBoundingClientRect();
-        if (e.touches) {
-            return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
-        }
-        return { x: e.clientX - r.left, y: e.clientY - r.top };
-    }
-
-    function clearAll() {
-        if (animId) cancelAnimationFrame(animId);
-        rawPoints    = [];
-        fourierData  = [];
-        epicyclePath = [];
-        animTime     = 0;
-        state = STATE.IDLE;
-        btnRun.disabled = true;
-        btnRun.style.opacity = '0.4';
-        hint.textContent = 'Desenhe algo no canvas e clique em Animar.';
-        drawIdle();
-    }
-
-    function drawIdle() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Grade sutil
-        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-        ctx.lineWidth = 1;
-        for (let x = 0; x < canvas.width;  x += 40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
-        for (let y = 0; y < canvas.height; y += 40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
-        // Instrução central se vazio
-        if (rawPoints.length === 0) {
-            ctx.fillStyle = 'rgba(255,255,255,0.08)';
-            ctx.font = '14px monospace';
-            ctx.textAlign = 'center';
-            ctx.fillText('✏  desenhe aqui', canvas.width / 2, canvas.height / 2);
-            ctx.textAlign = 'left';
-        }
-    }
-
-    // DFT Complexa 
-    // Trata cada ponto (x,y) como número complexo x + iy
-    // Retorna array de {re, im, freq, amp, phase} ordenado por amplitude
-    function dft(points) {
-        const N = points.length;
-        const result = [];
-        for (let k = 0; k < N; k++) {
-            let re = 0, im = 0;
-            for (let n = 0; n < N; n++) {
-                const phi = (2 * Math.PI * k * n) / N;
-                re += points[n].x * Math.cos(phi) + points[n].y * Math.sin(phi);
-                im += -points[n].x * Math.sin(phi) + points[n].y * Math.cos(phi);
+    // Forma pronta
+    const PRESETS = {
+        'Estrela': () => {
+            const pts = [];
+            const spikes = 5, outer = 90, inner = 38;
+            for (let i = 0; i < spikes * 2; i++) {
+                const r   = i % 2 === 0 ? outer : inner;
+                const ang = (Math.PI / spikes) * i - Math.PI / 2;
+                pts.push({ x: r * Math.cos(ang), y: r * Math.sin(ang) });
             }
-            re /= N; im /= N;
-            result.push({
-                freq:  k,
-                amp:   Math.sqrt(re * re + im * im),
-                phase: Math.atan2(im, re),
+            return interpolate(pts, 256);
+        },
+        'Coração': () => {
+            const pts = [];
+            for (let i = 0; i < 256; i++) {
+                const t = (2 * Math.PI * i) / 256;
+                pts.push({
+                    x:  80 * 16 * Math.pow(Math.sin(t), 3) / 16,
+                    y: -80 * (13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) / 16
+                });
+            }
+            return pts;
+        },
+        'Flor': () => {
+            const pts = [];
+            for (let i = 0; i < 256; i++) {
+                const t = (2 * Math.PI * i) / 256;
+                const r = 75 * Math.abs(Math.cos(3 * t));
+                pts.push({ x: r * Math.cos(t), y: r * Math.sin(t) });
+            }
+            return pts;
+        },
+    };
+
+    // Helpers Matemáticos
+    function interpolate(points, N) {
+        const closed = [...points, points[0]];
+        const lengths = [];
+        let total = 0;
+        for (let i = 0; i < closed.length - 1; i++) {
+            const d = Math.hypot(closed[i+1].x - closed[i].x, closed[i+1].y - closed[i].y);
+            lengths.push(d);
+            total += d;
+        }
+        const step = total / N;
+        const out  = [];
+        let seg = 0, walked = 0;
+        for (let k = 0; k < N; k++) {
+            const target = k * step;
+            while (seg < lengths.length - 1 && walked + lengths[seg] < target) {
+                walked += lengths[seg++];
+            }
+            const t = lengths[seg] > 0 ? (target - walked) / lengths[seg] : 0;
+            out.push({
+                x: closed[seg].x + t * (closed[seg+1].x - closed[seg].x),
+                y: closed[seg].y + t * (closed[seg+1].y - closed[seg].y),
             });
         }
-        // Ordena do círculo maior para o menor
-        return result.sort((a, b) => b.amp - a.amp);
+        return out;
     }
 
-    // Amostrador: reduz para N pontos igualmente espaçados 
     function resample(points, N) {
         if (points.length <= N) return points;
-        const step = Math.floor(points.length / N);
-        const out = [];
-        for (let i = 0; i < points.length; i += step) out.push(points[i]);
-        return out.slice(0, N);
+        return interpolate(points, N);
     }
 
-    // Centraliza pontos no canvas
     function centerPoints(points) {
         const cx = points.reduce((s, p) => s + p.x, 0) / points.length;
         const cy = points.reduce((s, p) => s + p.y, 0) / points.length;
         return points.map(p => ({ x: p.x - cx, y: p.y - cy }));
     }
 
-    //  Loop de animação 
+    function dft(points) {
+        const N = points.length;
+        return Array.from({ length: N }, (_, k) => {
+            let re = 0, im = 0;
+            for (let n = 0; n < N; n++) {
+                const phi = (2 * Math.PI * k * n) / N;
+                re +=  points[n].x * Math.cos(phi) + points[n].y * Math.sin(phi);
+                im += -points[n].x * Math.sin(phi) + points[n].y * Math.cos(phi);
+            }
+            re /= N; im /= N;
+            return { freq: k, amp: Math.sqrt(re*re + im*im), phase: Math.atan2(im, re) };
+        }).sort((a, b) => b.amp - a.amp);
+    }
+
+    function runAnimation(points) {
+        if (animId) cancelAnimationFrame(animId);
+        const sampled = resample(centerPoints(points), 256);
+        fourierData   = dft(sampled);
+        epicyclePath  = [];
+        animTime      = 0;
+        state         = STATE.ANIMATING;
+        animate();
+    }
+
+    // Animação
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
 
-        const N   = fourierData.length;
-        const dt  = (2 * Math.PI) / N;
-        const cx0 = canvas.width  / 2;
-        const cy0 = canvas.height / 2;
-
-        // Epiciclos
-        let x = cx0, y = cy0;
+        const N  = fourierData.length;
+        const dt = (2 * Math.PI) / N;
+        let x = canvas.width / 2, y = canvas.height / 2;
 
         for (let i = 0; i < N; i++) {
             const { freq, amp, phase } = fourierData[i];
-            const prevX = x, prevY = y;
-
+            const px = x, py = y;
             x += amp * Math.cos(freq * animTime + phase);
             y += amp * Math.sin(freq * animTime + phase);
 
-            // Círculo
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(79,195,247,0.18)';
-            ctx.lineWidth = 1;
-            ctx.arc(prevX, prevY, amp, 0, Math.PI * 2);
-            ctx.stroke();
+            if (amp > 0.5) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(79,195,247,0.85)';
+                ctx.lineWidth = 1;
+                ctx.arc(px, py, amp, 0, Math.PI * 2);
+                ctx.stroke();
 
-            // Braço
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(192,132,252,0.55)';
-            ctx.lineWidth = 1.2;
-            ctx.moveTo(prevX, prevY);
-            ctx.lineTo(x, y);
-            ctx.stroke();
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(192,132,252,0.5)';
+                ctx.lineWidth = 1.2;
+                ctx.moveTo(px, py);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
         }
 
-        // Registra ponto do último epiciclo
+        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.font = "14px monospace";
+        ctx.fillText(`Epiciclos: ${N}`, 20, 30);
+
         epicyclePath.unshift({ x, y });
         if (epicyclePath.length > N) epicyclePath.pop();
 
-        // Linha de conexão (ponta → início do rastro)
-        if (epicyclePath.length > 1) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-            ctx.lineWidth = 1;
-            ctx.moveTo(x, y);
-            ctx.lineTo(epicyclePath[0].x, epicyclePath[0].y);
-            ctx.stroke();
-        }
-
-        // Rastro do desenho
         if (epicyclePath.length > 1) {
             ctx.beginPath();
             ctx.strokeStyle = '#ffb74d';
             ctx.lineWidth = 2.5;
-            ctx.lineJoin  = 'round';
-            ctx.lineCap   = 'round';
-            epicyclePath.forEach((p, i) => {
-                if (i === 0) ctx.moveTo(p.x, p.y);
-                else         ctx.lineTo(p.x, p.y);
-            });
+            ctx.lineJoin = ctx.lineCap = 'round';
+            epicyclePath.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
             ctx.stroke();
         }
 
-        // Ponto da ponta
         ctx.beginPath();
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = '#fff';
         ctx.arc(x, y, 3, 0, Math.PI * 2);
         ctx.fill();
 
@@ -206,95 +168,194 @@
         animId = requestAnimationFrame(animate);
     }
 
-    // ── Eventos de desenho ─────────────────────────────────────────────────────
-    let isDrawing  = false;
-    let lastSample = 0;
-    const SAMPLE_INTERVAL = 12; // ms — controla densidade dos pontos
-
-    function startDraw(e) {
-        if (state === STATE.ANIMATING) return;
-        if (animId) cancelAnimationFrame(animId);
-        state      = STATE.DRAWING;
-        isDrawing  = true;
-        rawPoints  = [];
-        epicyclePath = [];
-        btnRun.disabled = true;
-        btnRun.style.opacity = '0.4';
-        drawIdle();
-
-        const pos = getPos(e);
-        rawPoints.push(pos);
-        lastSample = Date.now();
-
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth   = 2.5;
-        ctx.lineCap     = 'round';
-        ctx.lineJoin    = 'round';
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
+    // Canvas Helpers
+    function drawGrid() {
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = 1;
+        for (let gx = 0; gx < canvas.width;  gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, canvas.height); ctx.stroke(); }
+        for (let gy = 0; gy < canvas.height; gy += 40) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(canvas.width, gy);   ctx.stroke(); }
     }
 
-    function moveDraw(e) {
-        if (!isDrawing || state !== STATE.DRAWING) return;
-        e.preventDefault();
-        const pos = getPos(e);
-        const now = Date.now();
-
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-
-        // Amostra com throttle para não ter pontos demais
-        if (now - lastSample > SAMPLE_INTERVAL) {
-            rawPoints.push(pos);
-            lastSample = now;
+    function drawIdle(msg) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+        if (msg) {
+            ctx.fillStyle = 'rgba(255,255,255,0.1)';
+            ctx.font = '14px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(msg, canvas.width / 2, canvas.height / 2);
+            ctx.textAlign = 'left';
         }
     }
 
-    function endDraw() {
-        if (!isDrawing) return;
-        isDrawing = false;
-
-        if (rawPoints.length < 8) {
-            hint.textContent = 'Desenho muito curto — tente novamente.';
-            state = STATE.IDLE;
-            return;
-        }
-
-        btnRun.disabled = false;
-        btnRun.style.opacity = '1';
-        hint.textContent = `${rawPoints.length} pontos capturados — clique em Animar!`;
-        state = STATE.IDLE;
+    // ui Helpers
+    function makeBtn(label, color) {
+        const btn = document.createElement('button');
+        btn.textContent = label;
+        btn.style.cssText = `
+            font-family:monospace; font-size:12px; cursor:pointer;
+            padding:7px 16px; border-radius:20px;
+            border:2px solid ${color}; color:${color};
+            background:transparent; transition:all .2s;
+        `;
+        btn.addEventListener('mouseenter', () => { if (!btn.disabled) { btn.style.background = color; btn.style.color = '#111'; } });
+        btn.addEventListener('mouseleave', () => { btn.style.background = 'transparent'; btn.style.color = color; });
+        return btn;
     }
 
-    canvas.addEventListener('mousedown',  startDraw);
-    canvas.addEventListener('mousemove',  moveDraw);
-    canvas.addEventListener('mouseup',    endDraw);
-    canvas.addEventListener('mouseleave', endDraw);
-    canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e); }, { passive: false });
-    canvas.addEventListener('touchmove',  e => { e.preventDefault(); moveDraw(e);  }, { passive: false });
-    canvas.addEventListener('touchend',   endDraw);
+    function makeHint(text) {
+        const p = document.createElement('p');
+        p.textContent = text;
+        p.style.cssText = 'font-size:.75rem; color:#747e7d; margin:4px 0 0; width:100%; text-align:center;';
+        return p;
+    }
 
-    // ── Botões ─────────────────────────────────────────────────────────────────
-    btnRun.addEventListener('click', () => {
-        if (rawPoints.length < 8) return;
+    // ui - montagem
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `display:flex; flex-direction:column; align-items:center; width:${canvas.width}px; font-family:monospace;`;
+    canvas.parentNode.insertBefore(wrapper, canvas);
+    wrapper.appendChild(canvas);
 
-        // Prepara dados: resample → centraliza → DFT
-        const sampled  = resample(rawPoints, 256);
-        const centered = centerPoints(sampled);
-        fourierData    = dft(centered);
-        epicyclePath   = [];
-        animTime       = 0;
-        state          = STATE.ANIMATING;
-        hint.textContent = 'Animando com ' + fourierData.length + ' epiciclos.';
+    // Abas
+    const tabBar = document.createElement('div');
+    tabBar.style.cssText = 'display:flex; width:100%;';
 
-        if (animId) cancelAnimationFrame(animId);
-        animate();
+    const tabDefs = [
+        { id: 'draw',    label: 'Desenhar com Mouse' },
+        { id: 'presets', label: 'Formas Prontas' },
+    ];
+    const tabEls = {};
+    tabDefs.forEach(({ id, label }) => {
+        const btn = document.createElement('button');
+        btn.textContent  = label;
+        btn.dataset.tab  = id;
+        btn.style.cssText = `
+            flex:1; padding:10px; font-family:monospace; font-size:13px;
+            background:rgba(255,255,255,0.04); color:#747e7d;
+            border:1px solid #333; border-bottom:none; cursor:pointer; transition:all .2s;
+        `;
+        btn.addEventListener('click', () => switchTab(id));
+        tabBar.appendChild(btn);
+        tabEls[id] = btn;
+    });
+    wrapper.insertBefore(tabBar, canvas);
+
+    // Painéis
+    function makePanel() {
+        const d = document.createElement('div');
+        d.style.cssText = `
+            width:100%; padding:10px 0 8px; display:none;
+            background:rgba(255,255,255,0.03); border:1px solid #333; border-bottom:none;
+            align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+        `;
+        wrapper.insertBefore(d, canvas);
+        return d;
+    }
+
+    const panelDraw    = makePanel();
+    const panelPresets = makePanel();
+
+    // Painel Desenhar
+    const btnAnimar = makeBtn('Animar', '#4fc3f7');
+    const btnLimpar = makeBtn('Limpar', '#747e7d');
+    const hintDraw  = makeHint('Desenhe no canvas e clique em Animar.');
+    btnAnimar.disabled = true; btnAnimar.style.opacity = '0.4';
+    panelDraw.append(btnAnimar, btnLimpar, hintDraw);
+
+    // Painel Formas Prontas
+    Object.entries(PRESETS).forEach(([name, fn]) => {
+        const btn = makeBtn(name, '#c084fc');
+        btn.addEventListener('click', () => {
+            if (animId) cancelAnimationFrame(animId);
+            runAnimation(fn());
+        });
+        panelPresets.appendChild(btn);
     });
 
-    btnClear.addEventListener('click', clearAll);
+    canvas.style.cssText += 'border:1px solid #333; border-top:none;';
 
-    // ── Início ─────────────────────────────────────────────────────────────────
-    drawIdle();
+    // Lógica de troca de abas
+    function switchTab(id) {
+        activeTab = id;
+        Object.entries(tabEls).forEach(([tid, el]) => {
+            const on = tid === id;
+            el.style.background  = on ? '#111' : 'rgba(255,255,255,0.04)';
+            el.style.color       = on ? '#4fc3f7' : '#747e7d';
+            el.style.borderColor = on ? '#4fc3f7' : '#333';
+        });
+        panelDraw.style.display    = id === 'draw'    ? 'flex' : 'none';
+        panelPresets.style.display = id === 'presets' ? 'flex' : 'none';
+
+        isDrawing = false;
+        if (animId) cancelAnimationFrame(animId);
+        state = STATE.IDLE; rawPoints = [];
+        drawIdle(id === 'draw' ? 'desenhe aqui' : 'escolha uma forma');
+    }
+
+    // Eventos — Desenho
+    let isDrawing  = false;
+    let lastSample = 0;
+
+    function getPos(e) {
+        const r   = canvas.getBoundingClientRect();
+        const src = e.touches ? e.touches[0] : e;
+        return { x: src.clientX - r.left, y: src.clientY - r.top };
+    }
+
+    canvas.addEventListener('mousedown', e => {
+        if (activeTab !== 'draw' || state === STATE.ANIMATING) return;
+        if (animId) cancelAnimationFrame(animId);
+        isDrawing = true; rawPoints = []; state = STATE.DRAWING;
+        btnAnimar.disabled = true; btnAnimar.style.opacity = '0.4';
+        drawIdle();
+        const pos = getPos(e);
+        rawPoints.push(pos); lastSample = Date.now();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5;
+        ctx.lineCap = ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+    });
+
+    canvas.addEventListener('mousemove', e => {
+        if (!isDrawing || activeTab !== 'draw') return;
+        const pos = getPos(e), now = Date.now();
+        ctx.lineTo(pos.x, pos.y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+        if (now - lastSample > 12) { rawPoints.push(pos); lastSample = now; }
+    });
+
+    const stopDraw = () => {
+        if (!isDrawing) return;
+        isDrawing = false;
+        if (rawPoints.length >= 8) {
+            btnAnimar.disabled = false; btnAnimar.style.opacity = '1';
+            hintDraw.textContent = `${rawPoints.length} pontos — clique em Animar!`;
+        } else {
+            hintDraw.textContent = 'Desenho muito curto — tente novamente.';
+            state = STATE.IDLE;
+        }
+    };
+
+    canvas.addEventListener('mouseup',    stopDraw);
+    canvas.addEventListener('mouseleave', stopDraw);
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY })); }, { passive: false });
+    canvas.addEventListener('touchmove',  e => { e.preventDefault(); canvas.dispatchEvent(new MouseEvent('mousemove', { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY })); }, { passive: false });
+    canvas.addEventListener('touchend',   stopDraw);
+
+    // Eventos - Botões
+    btnAnimar.addEventListener('click', () => {
+        if (rawPoints.length < 8) return;
+        hintDraw.textContent = 'Animando com epiciclos...';
+        runAnimation(rawPoints.map(p => ({ x: p.x - canvas.width / 2, y: p.y - canvas.height / 2 })));
+    });
+
+    btnLimpar.addEventListener('click', () => {
+        if (animId) cancelAnimationFrame(animId);
+        rawPoints = []; state = STATE.IDLE;
+        btnAnimar.disabled = true; btnAnimar.style.opacity = '0.4';
+        hintDraw.textContent = 'Desenhe no canvas e clique em Animar.';
+        drawIdle('desenhe aqui');
+    });
+
+    // Init
+    switchTab('draw');
 })();

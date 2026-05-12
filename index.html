@@ -32,10 +32,10 @@
 
     <div class="slide" id="slide-1">
     <div class="ui">
-        <h1>O que são as Séries de Fourier?</h1>
+        <h1>1. O que são as Séries de Fourier?</h1>
         
-        <p>A <strong>Série de Fourier</strong> é uma ferramenta matemática que decompõe funções periódicas complexas em uma soma infinita de senos e cossenos (termos harmônicos) mais simples. Ela permite representar sinais no <strong>domínio da frequência</strong>, facilitando análises físicas, acústicas e o processamento de sinais.</p>
-        <p>Um exemplo seria pegar um som complexo e descobrir quais notas individuais o compõem. Cada termo na série representa uma "nota" ou frequência específica, e a soma de todas essas notas recria o som original.</p>
+        <p>A <strong>Série de Fourier</strong> é uma ferramenta matemática que decompõe <u>funções periódicas complexas</u> em uma soma infinita de senos e cossenos (termos harmônicos) mais simples. Ela permite representar sinais no <strong>domínio da frequência</strong>, facilitando análises físicas, acústicas e o processamento de sinais.</p>
+        <p>Um exemplo seria pegar um som complexo e descobrir quais notas individuais o compõem. Cada termo na série representa uma nota ou frequência específica, e a soma de todas essas notas recria o som original.</p>
 
         <div class="math-box">
             <h3>A Forma Geral</h3>
@@ -75,35 +75,41 @@
 
     <div class="slide" id="slide-2">
             <div class="ui">
-        <h1>O que tem haver com Computação Gráfica?</h1>
-        <p>As séries de Fourier não são apenas para sons ou sinais; elas também são uma ferramenta poderosa para a computação gráfica. 
-            Elas nos permitem criar formas complexas, animar movimentos suaves e até mesmo simular fenômenos naturais como ondas e luz.</p>
-        <p>Vamos começar com um exemplo clássico: a onda quadrada. Ela é composta por uma série de ondas senoidais, e à medida que adicionamos mais harmônicos, a forma se torna cada vez mais parecida com uma onda quadrada perfeita.</p>
-        <h2>Fenômeno de Gibbs</h2>
-        <p>Mesmo com um número infinito de harmônicos, a série de Fourier de uma onda quadrada apresenta um fenômeno chamado "Fenômeno de Gibbs".
+        <h1>2. O que tem haver com Computação Gráfica?</h1>
+        <p>As séries de Fourier não são apenas para sons ou sinais. Na computação gráfica, elas são ferramentas fundamentais para gerar formas complexas, animar movimentos de fluidos e simular fenômenos físicos, como a propagação de ondas e o comportamento da luz. Vamos analisar o uso de Fourier na <u>modelagem gráfica</u>.</p>
+        <h3>E a Curva de Bézier?</h3>
+        <p>Embora as Curvas de Bézier sejam definidas naturalmente por polinômios, elas podem ser aproximadas e analisadas através de Séries de Fourier. Podemos decompor formas geométricas em somas de funções senoidais. Isso significa que podemos usar as séries de Fourier para criar formas <strong>suaves e complexas</strong>, como as curvas de Bézier, a partir de componentes mais <strong>simples</strong>.</p>
+        <h1>3. A Onda Quadrada</h1>
+        <p>Um exemplo inicial é a onda quadrada, que é uma função degrau periódica. Vamos tentar aproxima-la por uma série de ondas senoidais.</p>
+        <canvas id="onda"></canvas>
             </div>
     </div>
 
     <div class="slide" id="slide-3">
             <div class="ui">
-        <h1>1. A Onda Quadrada</h1>
-        <p>Harmônicos: <span id="hCount">5</span></p>
-        <p class="instruction">Use as teclas <- e -> para alterar os harmônicos.</p>
-        <p>Um único harmônico produz uma função seno; quanto mais harmônicos, mais próximo da onda quadrada.</p>
+        <h1>4. Modelando com Séries de Fourier</h1>
+        <p>Harmônicos: <span id="hCount">10</span>   (<instruction>Use as teclas <- e -> para alterar os harmônicos.</instruction>)</p>
+        <p>Um único harmônico produz uma função seno. Quanto mais harmônicos, mais próximo da onda quadrada.</p> </div>
+        
+        <canvas id="fourierCanvas"></canvas>
+
+        <div class="ui">
+        <h2>Fenômeno de Gibbs</h2>
+        <p>Mesmo com um número <strong>suficientemente grande</strong> de harmônicos, a série de Fourier de uma onda quadrada apresenta um fenômeno chamado Fenômeno de Gibbs.
+        Ele surge como uma oscilação persistente perto dos pontos de descontinuidade da função, resultando em um <strong>pico</strong> que não desaparece completamente, mesmo com a adição de mais termos à série.</p>
             </div>
-    <canvas id="fourierCanvas"></canvas>
     </div>
 
     <div class="slide" id="slide-4">
             <section class="lesson-part">
                 <div class="ui">
-                    <h1>2. A Transformada de Fourier</h1>
-                    <p> De maneira simples, a transformada de fourier é uma ferramenta matemática que divide qualquer padrão complexo em várias ondas senoidais puras e simples.</p>
+                    <h1>5. A Transformada de Fourier</h1>
+                    <p> De maneira simples, a transformada de Fourier é uma ferramenta matemática que divide qualquer padrão complexo em várias ondas senoidais puras e simples.</p>
                 </div>
                 <p class="instruction">Arraste o controle para ver como a soma de ondas simples forma uma onda quadrada.</p>
                 <input type="range" id="harmonics-slider" min="1" max="150" step="2" value="10" style="width: 80%;">
                 <p>Harmônicos ativos: <span id="harmonics-val">1</span></p>
-            <div class="canvas-container"> <canvas id="harmonicsCanvas"></canvas>  </div>
+                <div class="canvas-container"> <canvas id="harmonicsCanvas"></canvas>  </div>
                 <p> Visualmente, você verá que as primeiras ondas senoidais são as que mais fazem diferença. Com o slider na metade, temos a forma geral da onda, mas está toda ondulada. Só precisamos das pequenas que restaram para aplanar as ondulações.</p>
          </section>
     </div>
@@ -111,13 +117,12 @@
     <div class="slide" id="slide-5">
             <section class="lesson-part">
                 <div class="ui">
-                    <h1>3. A Senoide Complexa</h1>
+                    <h1>6. A Senoide Complexa</h1>
                     <p>Até o momento, olhamos apenas para ondas em 2D para entender som ou linhas simples. 
-                        Mas para desenhar uma forma bidimensional ao longo do tempo, as ondas senoidais normais não são suficientes. 
-                        Precisamos transformá-las em "espirais tridimencionais".</p>
+                        Mas, para desenhar uma forma bidimensional ao longo do tempo, as ondas senoidais normais não são suficientes. 
+                        Precisamos transformá-las em <strong>espirais tridimensionais</strong>.</p>
 
-                    <p> A perspectiva define a forma! Uma onda espiral 3D carrega um segredo geométrico. 
-                        Quando observada de lado ela se comporta como uma onda senoidal clássica. Mas quando observada de frente, essa mesma onda é um círculo perfeito. </p>
+                    <p> A geometria de uma onda espiral 3D mostra como o referencial altera a percepção do objeto. Enquanto a vista lateral mapeia a função como uma <u>onda senoidal</u>, a projeção frontal a reduz em uma <u>circunferência</u>. </p>
                 </div>
             </section>
             <canvas id="complexSinusoidCanvas"></canvas>
@@ -127,7 +132,7 @@
 
     <div class="slide" id="slide-6">
             <div class="ui">
-                <h1>4. Desenhando Formas Complexas com Epíciclos</h1>
+                <h1>7. Desenhando Formas Complexas com Epíciclos</h1>
                 <p>Como transformamos um rastro no papel em uma dança de círculos?</p>
             </div>
 
@@ -153,7 +158,7 @@
             </div>
 
             <div class="step-card">
-                <h3>Passo 2:Os epiciclos</h3>
+                <h3>Passo 2: Os epiciclos</h3>
                 <canvas id="canvas-passo2" width="200" height="150"></canvas>
                 <code>DFT → {amp, freq, fase}</code>
                 <p>
@@ -174,7 +179,7 @@
 
     <div class="slide" id="slide-7">
             <div class="ui">
-                <h1>5. Exemplo de Desenhos com Círculos</h1>
+                <h1>8. Implementação</h1>
             </div>
         <canvas id="example" width="400" height="400" style="background: #111; border-radius: 10px;"></canvas>
     </div>
@@ -187,7 +192,8 @@
             <p><a href="https://www.jezzamon.com/fourier/pt-br.html" target="_blank">Inspiração: "Uma introdução interativa às transformadas de Fourier" de Jez Swanson</a></p>
             <br>
             <p>Este material foi desenvolvido com auxílio de Inteligência Artificial para a interface gráfica, produção do exemplo da sinoide complexa, bem como, resolução de conflitos no código.</p>
-            
+            <a href="https://chatgpt.com/share/6a036155-35ac-83e9-9b1e-ff099f70c578" target="_blank">Link da conversa</a>
+
             <div style="margin-top: 50px;">
                 <button class="nav-btn-fixed" style="position: static;" onclick="showSlide(0)">Voltar ao Início</button>
             </div>
@@ -230,5 +236,6 @@
     <script src="script-harmonics.js"></script>
     <script src="script-passos.js"></script>
     <script src="script-example.js"></script>
+    <script src="script-onda.js"></script>
 </body>
 </html>

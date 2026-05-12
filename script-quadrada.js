@@ -105,6 +105,8 @@ function draw(){
 
 
     time -= 0.02; 
+    document.getElementById('hCount').innerText = numHarmonics;
+
     requestAnimationFrame(draw);
 }
 
